@@ -31,20 +31,30 @@
                         <th scope="col">Nombre</th>
                         <th scope="col">Marca</th>
                         <th scope="col">Imagen</th>
+                        <th scope="col">Stock</th>
+                        <th scope="col">Precio</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="">
-                        <td scope="row">1</td>
-                        <td>Marillo</td>
-                        <td>django</td>
-                        <td>imagen.jpf</td>
+
+
+                    {% for producto in productos %}
+
+                    <tr>
+                        <td scope="row">{{ producto.id_producto }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.marca }}</td>
+                        <td>
+                            <img src="{{ producto.imagen.url }}" height="100">
+                        </td>
+                        <td>{{ producto.stock }}</td>
+                        <td>${{ producto.precio }}</td>
                         <td> <a
                             name=""
                             id=""
                             class="btn btn-info"
-                            href="{% url 'editar_producto' %}"
+                            href="{% url 'editar_producto' producto.id_producto %}"
                             role="button"
                             >Editar
                             </a>
@@ -52,12 +62,15 @@
                             name=""
                             id=""
                             class="btn btn-danger"
-                            href="#"
+                            href="{% url 'eliminar_producto' producto.id_producto %}"
                             role="button"
                             >Borrar
                             </a>
                         </td>
                     </tr>
+
+                    {% endfor %}
+
                 </tbody>
             </table>
         </div>
