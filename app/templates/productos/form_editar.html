@@ -1,0 +1,30 @@
+<form enctype="multipart/form-data" id="form-editar" data-id="{{ producto.id_producto }}">
+
+    {% csrf_token %}
+    {% for campo in formulario %}
+    <div class="mb-3">
+        <label for="" class="form-label">{{ campo.label }}:</label>
+
+        {% if campo.field.widget.input_type == 'file' and campo.value %}
+            {% if producto.imagen %}
+                <br>
+                <!-- <img src="{{ campo.value.url }}" width="100" alt="imagen actual"> -->
+                <img src="{{MEDIA_URL}}/imagenes/{{ campo.value}}" width="100" alt="" srcset="">
+            {% endif %}
+        {% endif %}
+        <input type="{{ campo.field.widget.input_type}}" class="form-control" name="{{ campo.name }}"
+            id="{{ campo.name}}" aria-describedby="helpId" placeholder="{{ campo.label }}"
+            value="{{ campo.value | default:''}}" />
+    </div>
+
+    <div class="col-12 help-text text-danger" id="error-{{ campo.name}}">
+        {{campo.errors}}
+    </div>
+    {% endfor %}
+
+    <input class="btn btn-success" type="submit" value="Enviar formulario" />
+
+    <a class="btn btn-primary" href="{% url 'productos' %}" role="button">Cancelar</a>
+
+
+</form>

@@ -9,8 +9,11 @@
     <div class="card-header">Editar un producto</div>
     <div class="card-body">
         <h4 class="card-title">Datos del producto</h4>
-        {% include 'productos/form.html' %}
+        {% include 'productos/form_editar.html' %}
     </div>
 </div>
 
+{% endblock %}
+{% block extra_js %}
+<script type="module" src="{% static 'app/js/editar.js' %}"></script>
 {% endblock %}

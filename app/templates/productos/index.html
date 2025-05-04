@@ -36,48 +36,18 @@
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
 
-
-                    {% for producto in productos %}
-
-                    <tr>
-                        <td scope="row">{{ producto.id_producto }}</td>
-                        <td>{{ producto.nombre }}</td>
-                        <td>{{ producto.marca }}</td>
-                        <td>
-                            <img src="{{ producto.imagen.url }}" height="100">
-                        </td>
-                        <td>{{ producto.stock }}</td>
-                        <td>${{ producto.precio }}</td>
-                        <td> <a
-                            name=""
-                            id=""
-                            class="btn btn-info"
-                            href="{% url 'editar_producto' producto.id_producto %}"
-                            role="button"
-                            >Editar
-                            </a>
-                        | <a
-                            name=""
-                            id=""
-                            class="btn btn-danger"
-                            href="{% url 'eliminar_producto' producto.id_producto %}"
-                            role="button"
-                            >Borrar
-                            </a>
-                        </td>
-                    </tr>
-
-                    {% endfor %}
+                <tbody id="tabla-productos">
 
                 </tbody>
             </table>
         </div>
     </div>
-    <div class="card-footer text-muted">
-    </div>
 </div>
 
+<meta name="csrf-token" content="{{ csrf_token }}">
 
+{% endblock %}
+{% block extra_js %}
+<script type="module" src="{% static 'app/js/api.js' %}"> </script>
 {% endblock %}

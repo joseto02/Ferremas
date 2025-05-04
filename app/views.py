@@ -20,12 +20,12 @@ def crear_producto(request):
 
 
 def editar_producto(request, id_producto):
-    producto = Producto.objects.get(id_producto = id_producto)
+    producto = Producto.objects.get(id_producto=id_producto)
     formulario = ProductoForm(request.POST or None, request.FILES or None, instance=producto)
     if formulario.is_valid() and request.POST:
         formulario.save()
-        return redirect('productos')
-    return render(request, "productos/editar.html", {'formulario': formulario})
+        return redirect("productos")
+    return render(request, "productos/editar.html", {"formulario": formulario, "producto": producto})
 
 
 def eliminar_producto(request, id_producto):

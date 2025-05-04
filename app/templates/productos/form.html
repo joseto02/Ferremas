@@ -1,4 +1,4 @@
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" id="form-producto">
 
     {% csrf_token %}
     {% for campo in formulario %}
@@ -13,33 +13,19 @@
             type="{{ campo.field.widget.input_type}}"
             class="form-control"
             name="{{ campo.name }}"
-            id=""
+            id="{{ campo.name}}"
             aria-describedby="helpId"
             placeholder="{{ campo.label }}"
             value="{{ campo.value | default:''}}"
         />
     </div>
-    <div class="col-12 help-text">
+    <div class="col-12 help-text text-danger" id="error-{{ campo.name}}">
         {{campo.errors}}
     </div>
     {% endfor %}
 
-    <input
-        name=""
-        id=""
-        class="btn btn-success"
-        type="submit"
-        value="Enviar formulario"
-    />
+    <input class="btn btn-success" type="submit" value="Enviar formulario"/>
 
-    <a
-        name=""
-        id=""
-        class="btn btn-primary"
-        href="{% url 'productos' %}"
-        role="button"
-        >Cancelar</a
-    >
-    
-    
+    <a class="btn btn-primary" href="{% url 'productos' %}" role="button">Cancelar</a>
+
 </form>
