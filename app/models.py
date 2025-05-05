@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 
@@ -11,17 +12,13 @@ class RolUsuario(models.Model):
         return self.nombre
 
 
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    contrasena = models.CharField(max_length=128)  # Para hash
+class Usuario(AbstractUser): 
     direccion = models.CharField(max_length=100)
     numero_telefono = models.CharField(max_length=15)
     rol = models.ForeignKey(RolUsuario, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido}"
+        return f"{self.username} {self.first_name} {self.last_name}"
 
 
 class Producto(models.Model):

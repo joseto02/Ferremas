@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from . import views
 
 from django.conf import settings
@@ -18,6 +18,11 @@ urlpatterns = [
     path("productos/editar", views.editar_producto, name="editar_producto"),
     path("eliminar/<int:id_producto>", views.eliminar_producto, name="eliminar_producto"),
     path("productos/editar/<int:id_producto>", views.editar_producto, name="editar_producto"),
+    
+    path("login", views.login, name="login"),
+    path("register", views.register, name="register"),
+    
+    
     
     
     path("", include(router.urls))

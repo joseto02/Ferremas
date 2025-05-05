@@ -1,4 +1,5 @@
-# Django
+Django
 PyMySQL
 mysqlclient
 Pillow
+djangorestframework

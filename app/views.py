@@ -1,6 +1,13 @@
 from django.shortcuts import render, redirect
-from .models import Producto
+from .models import Producto, Usuario
 from .forms import ProductoForm
+
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+
+from .serializers import UsuarioSerializer
 
 # Create your views here.
 
@@ -32,3 +39,25 @@ def eliminar_producto(request, id_producto):
     producto = Producto.objects.get(id_producto = id_producto)
     producto.delete()
     return redirect("productos")
+
+@api_view(['POST'])
+def login (request):
+    return Response({})
+
+
+@api_view(["POST"])
+def register(request):
+    
+    serializer = UsuarioSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        
+        user = Usuario.objects.get(username=serializer.data['username'])
+        user.set_password(serializer.data['password'])
+        user.save()
+        
+        token = Token.objects.create(user=user)
+        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_201_CREATED)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
