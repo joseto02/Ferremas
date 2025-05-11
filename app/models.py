@@ -12,7 +12,8 @@ class RolUsuario(models.Model):
         return self.nombre
 
 
-class Usuario(AbstractUser): 
+class Usuario(AbstractUser):
+    email = models.EmailField(unique=True) 
     direccion = models.CharField(max_length=100)
     numero_telefono = models.CharField(max_length=15)
     rol = models.ForeignKey(RolUsuario, on_delete=models.SET_NULL, null=True)
