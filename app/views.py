@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Producto, Usuario
+from .models import Producto, Usuario, Carrito, ItemCarrito
 from .forms import ProductoForm
 
 from rest_framework import status
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 
-from .serializers import UsuarioSerializer
+from .serializers import UsuarioSerializer, ItemCarritoSerializer, CarritoSerializer
 
 # Create your views here.
 
@@ -104,3 +104,57 @@ def login_view(request):
 
 def register_view(request):
     return render(request, "autenticacion/register.html")
+
+@api_view(['POST'])
+def agregar_al_carrito(request):
+    usuario = request.user
+    producto_id = request.data.get('producto_id')
+    cantidad = request.data.get('cantidad', 1)
+    
+    carrito, creado = Carrito.objects.get_or_create(usuario=usuario)
+    item, creado = ItemCarrito.objects.get_or_create(carrito=carrito, producto_id=producto_id)
+    
+    if not creado:
+        item.cantidad += cantidad
+    else:
+        item.cantidad = cantidad
+    item.save()
+    
+    return Response({'mensaje': 'Producto agregado al carrito'})
+
+@api_view(['GET'])
+def obtener_carrito(request):
+    usuario = request.user
+    carrito = Carrito.objects.filter(usuario=usuario).first()
+
+    if not carrito:
+        return Response({'mensaje': 'Carrito vacío'}, status=status.HTTP_200_OK)
+
+    serializer = CarritoSerializer(carrito)
+
+    return Response(serializer.data)
+
+
+@api_view(["DELETE"])
+def eliminar_item_carrito(request, item_id):
+    try:
+        item = ItemCarrito.objects.get(id=item_id, carrito_usurio=request.user)
+        item.delete()
+        return Response({"mensaje": "Item eliminado del carrito"})
+    except ItemCarrito.DoesNotExist:
+        return Response({"error": "Producto no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+def actualizar_cantidad_item(request, item_id):
+    cantidad = request.data.get('cantidad')
+    
+    if not cantidad or int(cantidad) <= 0:
+        return Response({'error': 'Cantidad inválida'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        item = ItemCarrito.objects.get(id=item_id, carrito__usuario=request.user)
+        item.cantidad = cantidad
+        item.save()
+        return Response({'mensaje': 'Cantidad actualizada'})
+    except ItemCarrito.DoesNotExist:
+        return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)

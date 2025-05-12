@@ -63,10 +63,10 @@ class Carrito(models.Model):
 class ItemCarrito(models.Model):
     carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE, related_name="items")
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    cantidad = models.PositiveIntegerField(default=1)
 
-    def __str__(self):
-        return f"{self.producto} x{self.cantidad}"
+    class Meta:
+        unique_together = ('carrito', 'producto')
 
 
 class Orden(models.Model):

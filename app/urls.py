@@ -25,6 +25,12 @@ urlpatterns = [
     path("login", views.login_view, name="login"),
     path("register", views.register_view, name="register"),
     
+    path("api/carrito", views.obtener_carrito, name="obtener_carrito"),
+    path("api/carrito/agregar", views.agregar_al_carrito, name="agregar_al_carrito"),
+    path("api/carrito/eliminar/<int:item_id>", views.eliminar_item_carrito, name="eliminar_item_carrito"),
+    path("api/carrito/actualizar/<int:item_id>", views.actualizar_cantidad_item, name="actualizar_cantidad_item"),
+    
+    
     
     
     path("", include(router.urls))
