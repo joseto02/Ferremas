@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Producto, Usuario, Carrito, ItemCarrito
 from .forms import ProductoForm
+from django.contrib.auth import logout, login
 
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -64,6 +65,8 @@ def api_login(request):
         return Response(
             {"error": "Usuario inactivo"}, status=status.HTTP_400_BAD_REQUEST
         )
+        
+    login(request, user)
 
     token, created = Token.objects.get_or_create(user=user)
     serializer = UsuarioSerializer(instance=user)
@@ -89,14 +92,28 @@ def api_register(request):
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-@authentication_classes([TokenAuthentication])
+
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def profile(request):
-    
-    
-    
-    return Response("Estas en el perfil de {}".format(request.user.username), status=status.HTTP_200_OK)
+def api_logout(request):
+    try:
+        request.user.auth_token.delete()
+        return Response(
+            {"message": "Sesión cerrada exitosamente."}, status=status.HTTP_200_OK
+        )
+    except:
+        return Response(
+            {"error": "No se pudo cerrar sesión."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+# @api_view(['POST'])
+# @authentication_classes([TokenAuthentication])
+# @permission_classes([IsAuthenticated])
+# def profile(request):
+
+
+#     return Response("Estas en el perfil de {}".format(request.user.username), status=status.HTTP_200_OK)
 
 def login_view(request):
     return render(request, 'autenticacion/login.html')
@@ -105,46 +122,78 @@ def login_view(request):
 def register_view(request):
     return render(request, "autenticacion/register.html")
 
-@api_view(['POST'])
-def agregar_al_carrito(request):
-    usuario = request.user
-    producto_id = request.data.get('producto_id')
-    cantidad = request.data.get('cantidad', 1)
-    
-    carrito, creado = Carrito.objects.get_or_create(usuario=usuario)
-    item, creado = ItemCarrito.objects.get_or_create(carrito=carrito, producto_id=producto_id)
-    
-    if not creado:
-        item.cantidad += cantidad
-    else:
-        item.cantidad = cantidad
-    item.save()
-    
-    return Response({'mensaje': 'Producto agregado al carrito'})
+def cerrar_sesion(request):
+    logout(request)
+    return redirect("home")
 
-@api_view(['GET'])
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def agregar_al_carrito(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"error": "Debe iniciar sesión para agregar al carrito."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    usuario = request.user
+    producto_id = request.data.get("producto_id")
+
+    try:
+        producto = Producto.objects.get(id=producto_id)
+    except Producto.DoesNotExist:
+        return Response(
+            {"error": "Producto no encontrado."}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    carrito, creado = Carrito.objects.get_or_create(usuario=usuario)
+
+    item, creado = ItemCarrito.objects.get_or_create(carrito=carrito, producto=producto)
+    if not creado:
+        item.cantidad += int(request.data.get("cantidad", 1))
+    else:
+        item.cantidad = int(request.data.get("cantidad", 1))
+    item.save()
+
+    return Response({"mensaje": "Producto agregado al carrito correctamente."})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def obtener_carrito(request):
     usuario = request.user
     carrito = Carrito.objects.filter(usuario=usuario).first()
 
     if not carrito:
-        return Response({'mensaje': 'Carrito vacío'}, status=status.HTTP_200_OK)
+        return Response({"items": []}, status=status.HTTP_200_OK)
 
-    serializer = CarritoSerializer(carrito)
+    items = ItemCarrito.objects.filter(carrito=carrito)
+    data = []
 
-    return Response(serializer.data)
+    for item in items:
+        data.append(
+            {
+                "nombre": item.producto.nombre,
+                "cantidad": item.cantidad,
+                "precio": item.producto.precio,
+            }
+        )
 
+    return Response({"items": data}, status=status.HTTP_200_OK)
 
 @api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
 def eliminar_item_carrito(request, item_id):
     try:
-        item = ItemCarrito.objects.get(id=item_id, carrito_usurio=request.user)
+        item = ItemCarrito.objects.get(id=item_id, carrito_usuario=request.user)
         item.delete()
         return Response({"mensaje": "Item eliminado del carrito"})
     except ItemCarrito.DoesNotExist:
         return Response({"error": "Producto no encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['PUT'])
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
 def actualizar_cantidad_item(request, item_id):
     cantidad = request.data.get('cantidad')
     
@@ -158,3 +207,19 @@ def actualizar_cantidad_item(request, item_id):
         return Response({'mensaje': 'Cantidad actualizada'})
     except ItemCarrito.DoesNotExist:
         return Response({'error': 'Producto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+
+def carrito_view(request):
+    return render(request, 'carrito/carrito.html')
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def contador_carrito(request):
+    usuario = request.user
+    carrito = Carrito.objects.filter(usuario=usuario).first()
+    total = 0
+    if carrito:
+        total = sum(
+            item.cantidad for item in carrito.items.all()
+        )  
+    return Response({"total_items": total})

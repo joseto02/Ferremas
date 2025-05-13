@@ -6,33 +6,15 @@
 {% block content %}
     <h1>Bienvenido a ferremas</h1>
 
-    <!-- carousel -->
-    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{% static 'app/img/Logo1.jpg' %}" class="d-block w-100" alt="...">
-            </div>
-            <div class="carousel-item">
-                <img src="https://independent.typepad.com/.a/6a00d8341c595453ef01b8d2a29778970c-500wi" class="d-block w-100" alt="...">
-            </div>
-            <div class="carousel-item">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3lX-zWJHkRtHJUFo7j2OwJN4haQStPkEd8A&s" class="d-block w-100" alt="...">
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
-            data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
-            data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
-
     <!-- Productos -->
     <!-- Aca va la api de los Productos -->
     <h2>Productos</h2>
+    <div id="productos-container" class="d-flex flex-wrap gap-3">
 
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'app/js/home.js' %}"></script>
 {% endblock %}

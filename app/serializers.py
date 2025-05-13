@@ -21,8 +21,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
     
 class ItemCarritoSerializer(serializers.ModelSerializer):
     
-    producto_nombre = serializers.CharField(source='producto.nombre', read_only=True)
-    producto_precio = serializers.IntegerField(source='producto.precio', read_only=True)
+    # nombre = serializers.CharField(source='producto.nombre', read_only=True)
+    # precio = serializers.IntegerField(source='producto.precio', read_only=True)
     
     class Meta:
         model = ItemCarrito

@@ -14,16 +14,42 @@
     <header>
         <nav class="navbar bg-body-tertiary" data-bs-theme="dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="{% url 'home' %}">
                     <img src="{% static 'app/img/logo1.jpg' %}" alt="Logo" width="30" height="24"
                         class="d-inline-block align-text-top">
                     Ferremas
                 </a>
 
                 <div class="d-flex ms-auto align-items-center">
-                    <p id="user-info" class="mb-0 me-3"></p>
-                    <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Iniciar sesión</a>
-                    <a href="{% url 'register' %}" class="btn btn-light">Registrarse</a>
+                    <p id="user-info" class="mb-0 me-3 text-white">
+                        {% if request.user.is_authenticated %}
+                            ¡Hola, {{ request.user.username }}!
+                        {% endif %}
+                    </p>
+
+                    <a id="carrito-boton" class="btn btn-outline-light position-relative" data-bs-toggle="offcanvas" href="#carritoWidget" role="button" aria-controls="carritoWidget">
+                        🛒
+                        <span id="contador-carrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            0
+                        </span>
+                    </a>
+
+                    <div class="offcanvas offcanvas-end" tabindex="-1" id="carritoWidget" aria-labelledby="carritoWidgetLabel">
+                        <div class="offcanvas-header">
+                            <h5 id="carritoWidgetLabel" class="offcanvas-title">Carrito de Compras</h5>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body" id="contenido-carrito">
+                            <p>Tu carrito está vacío.</p>
+                        </div>
+                    </div>
+
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="btn btn-outline-light me-2">Cerrar sesión</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Iniciar sesión</a>
+                        <a href="{% url 'register' %}" class="btn btn-light">Registrarse</a>
+                    {% endif %}
                 </div>
             </div>
             
@@ -36,6 +62,7 @@
                 <br>
                 {% block content %}
                 {% endblock%}
+                <br>
             </div>
         </div>
     </div>
@@ -49,7 +76,7 @@
                     <h3>Enlaces</h3>
                     <ul>
                         <li>
-                            <a href="#">Inicio</a>
+                            <a href="{% url 'home' %}">Inicio</a>
                         </li>
                         <!-- <li>
                             <a href="#" class="btn btn-dark mt-2" role="button"
@@ -65,7 +92,7 @@
                 </div>
                 <div class="col">
                     <h3>Derechos de autor</h3>
-                    <p>Copyright ©℗®™ 2024 Sitio Web <br> Jose Gonzalez <br> Juan Rebolledo <br>Benjamin Torres</p>
+                    <p>Copyright ©℗®™ 2025 Sitio Web <br> Jose Gonzalez <br> Juan Rebolledo <br>Benjamin Torres</p>
                 </div>
             </div>
         </div>
@@ -93,6 +120,38 @@
         }
         window.csrftoken = getCookie("csrftoken");
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("token");
+            const logoutBtn = document.getElementById("logout-btn");
+
+            if (token && logoutBtn) {
+                logoutBtn.style.display = "inline-block";
+
+                logoutBtn.addEventListener("click", () => {
+                    fetch("/api/logout/", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": "Token " + token,
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": window.csrftoken  // si usas CSRF en la vista
+                        },
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                localStorage.removeItem("token");
+                                localStorage.removeItem("user");
+                                window.location.href = "{% url 'home' %}";
+                            } else {
+                                alert("Error al cerrar sesión");
+                            }
+                        });
+                });
+            }
+        });
+    </script>
+
     
 
     {% block extra_js %}
