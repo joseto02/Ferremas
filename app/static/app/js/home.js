@@ -59,6 +59,7 @@ function agregarAlCarrito(id) {
             actualizarContadorCarrito();
         })
         .catch(err => {
+
             console.error("Error al agregar al carrito:", err);
         });
 }

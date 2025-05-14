@@ -9,8 +9,8 @@ function mostrarNombreUsuario() {
 function actualizarContadorCarrito() {
     fetch('/api/carrito/', {
         headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            // 'Authorization': 'Token ' + localStorage.getItem('token')
+            // 'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            'Authorization': 'Token ' + localStorage.getItem('token'),
         }
     })
         .then(res => res.json())
@@ -34,7 +34,7 @@ function cerrarSesion() {
     fetch("/api/logout/", {
         method: "POST",
         headers: {
-            "Authorization": "Token " + token,
+            "Authorization": "Token " + localStorage.getItem("token"),
             "Content-Type": "application/json",
             "X-CSRFToken": window.csrftoken
         },
@@ -56,6 +56,7 @@ function cerrarSesion() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Script cargado corectamente");
     mostrarNombreUsuario();
     if (localStorage.getItem('token')) {
         actualizarContadorCarrito();
@@ -63,8 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const logoutBtn = document.getElementById("logout-btn");
     if (logoutBtn) {
+        console.log("boton logout encontrado");
         logoutBtn.addEventListener("click", (e) => {
-            e.preventDefault();  // Evita navegación si es <a href="#">
+            e.preventDefault();
             cerrarSesion();
         });
     }

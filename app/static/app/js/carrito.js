@@ -43,7 +43,7 @@ async function actualizarCantidad(id, cantidad) {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('token') // si usas token
+            'Authorization': 'Token ' + localStorage.getItem('token')
         },
         body: JSON.stringify({ cantidad })
     });
@@ -54,7 +54,7 @@ async function eliminarItem(id) {
     await fetch(`/api/carrito/eliminar/${id}`, {
         method: 'DELETE',
         headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token') // si usas token
+            'Authorization': 'Token ' + localStorage.getItem('token') 
         }
     });
     cargarCarrito();

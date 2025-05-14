@@ -142,9 +142,7 @@ def agregar_al_carrito(request):
     try:
         producto = Producto.objects.get(id_producto=producto_id)
     except Producto.DoesNotExist:
-        return Response(
-            {"error": "Producto no encontrado."}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Producto no encontrado."}, status=status.HTTP_404_NOT_FOUND)
 
     carrito, creado = Carrito.objects.get_or_create(usuario=usuario)
 

@@ -19,9 +19,9 @@ urlpatterns = [
     path("eliminar/<int:id_producto>", views.eliminar_producto, name="eliminar_producto"),
     path("productos/editar/<int:id_producto>", views.editar_producto, name="editar_producto"),
     
-    path("api/login/", views.api_login, name="api_login"),
-    path("api/register/", views.api_register, name="api_register"),
-    path("api/logout/", views.api_logout, name="api_logout"),
+    path("api/login", views.api_login, name="api_login"),
+    path("api/register", views.api_register, name="api_register"),
+    path("api/logout", views.api_logout, name="api_logout"),
     
     path("login", views.login_view, name="login"),
     path("register", views.register_view, name="register"),
