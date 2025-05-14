@@ -21,12 +21,15 @@ class UsuarioSerializer(serializers.ModelSerializer):
     
 class ItemCarritoSerializer(serializers.ModelSerializer):
     
-    # nombre = serializers.CharField(source='producto.nombre', read_only=True)
-    # precio = serializers.IntegerField(source='producto.precio', read_only=True)
+    id = serializers.IntegerField()
+    nombre = serializers.CharField(source='producto.nombre')
+    precio = serializers.DecimalField(source='producto.precio', max_digits=10, decimal_places=2)
+    imagen = serializers.ImageField(source='producto.imagen', required=False)
+    producto_id = serializers.IntegerField(source='producto.id_producto') #id_productos porque el modelo producto tiene como clave primaria id_producto
     
     class Meta:
         model = ItemCarrito
-        fields = '__all__'
+        fields = ['id', 'nombre', 'precio', 'imagen', 'producto_id', 'cantidad']
 
 class CarritoSerializer(serializers.ModelSerializer):
     items = ItemCarritoSerializer(many=True, read_only=True)

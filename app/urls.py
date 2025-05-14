@@ -19,15 +19,15 @@ urlpatterns = [
     path("eliminar/<int:id_producto>", views.eliminar_producto, name="eliminar_producto"),
     path("productos/editar/<int:id_producto>", views.editar_producto, name="editar_producto"),
     
-    path("api/login", views.api_login, name="api_login"),
-    path("api/register", views.api_register, name="api_register"),
-    path("api/logout", views.api_logout, name="api_logout"),
+    path("api/login/", views.api_login, name="api_login"),
+    path("api/register/", views.api_register, name="api_register"),
+    path("api/logout/", views.api_logout, name="api_logout"),
     
     path("login", views.login_view, name="login"),
     path("register", views.register_view, name="register"),
     path("logout", views.cerrar_sesion, name="logout"),
     
-    path("carrito", views.carrito_view, name="carrito"),
+    # path("carrito", views.carrito_view, name="carrito"),
     path("api/carrito/", views.obtener_carrito, name="obtener_carrito"),
     path("api/carrito/contador/", views.contador_carrito, name="contador_carrito"),
     path("api/carrito/agregar/", views.agregar_al_carrito, name="agregar_al_carrito"),

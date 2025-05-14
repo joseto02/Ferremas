@@ -32,7 +32,7 @@ function crearTarjetaProducto(producto) {
             <h5 class="card-title">${producto.nombre}</h5>
             <p class="card-text">Marca: ${producto.marca}</p>
             <p class="card-text"><strong>Precio:</strong> $${producto.precio}</p>
-            <button onclick="agregarAlCarrito(${producto.id})" class="btn btn-success">Agregar al carrito</button>
+            <button onclick="agregarAlCarrito(${producto.id_producto})" class="btn btn-success">Agregar al carrito</button>
         </div>
     `;
     return card;
@@ -43,7 +43,7 @@ function agregarAlCarrito(id) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": "token " + localStorage.getItem("token") 
+            "Authorization": "Token " + localStorage.getItem("token")
         },
         body: JSON.stringify({
             producto_id: id,
@@ -51,7 +51,7 @@ function agregarAlCarrito(id) {
         })
     })
         .then(res => {
-            if (!res.ok) throw new Error("Error al agregar al carrito (403)");
+            if (!res.ok) throw new Error("Error al agregar al carrito (" + res.status + ")");
             return res.json();
         })
         .then(data => {
@@ -66,7 +66,7 @@ function agregarAlCarrito(id) {
 function actualizarContadorCarrito() {
     fetch('/api/carrito/contador/', {
         headers: {
-            'Authorization': 'token ' + localStorage.getItem('token')
+            'Authorization': 'Token ' + localStorage.getItem('token')
         }
     })
         .then(res => res.json())
@@ -81,15 +81,15 @@ function actualizarContadorCarrito() {
 function cargarContenidoCarrito() {
     fetch('/api/carrito/', {
         headers: {
-            'Authorization': 'token ' + localStorage.getItem('token')
+            'Authorization': 'Token ' + localStorage.getItem('token')
         }
     })
         .then(res => {
             if (!res.ok) throw new Error('Error al cargar el carrito');
-            res.json()
+            return res.json();
         })
         .then(data => {
-            console.log("respuesta del carrito", data);
+            console.log("items recibido", data.items);
             const contenedor = document.getElementById('contenido-carrito');
             contenedor.innerHTML = "";
 
@@ -101,14 +101,37 @@ function cargarContenidoCarrito() {
             data.items.forEach(item => {
                 contenedor.innerHTML += `
                     <div class="mb-2 border-bottom pb-2">
+                        <img src="${item.imagen || 'https://via.placeholder.com/150'}" alt="${item.nombre}" class="img-thumbnail" width="50">
                         <strong>${item.nombre}</strong><br>
                         Cantidad: ${item.cantidad}<br>
-                        Precio: $${item.precio}
+                        Precio: $${item.precio * item.cantidad}<br>
+                        <button onclick="eliminarDelCarrito(${item.id})" class="btn btn-danger btn-sm">Eliminar</button>
                     </div>
                 `;
             });
         })
-    .catch(err => {
-        console.error("Error al obtener el carrito", err);
-    });
+        .catch(err => {
+            console.error("Error al obtener el carrito", err);
+        });
+}
+
+function eliminarDelCarrito(item_id) {
+    fetch(`http://127.0.0.1:8000/api/carrito/eliminar/${item_id}/`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': 'Token ' + localStorage.getItem('token'),
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => {
+            if (!res.ok) throw new Error('Error al eliminar el producto');
+            return res.json();
+        })
+        .then(data => {
+            alert(data.mensaje);
+            cargarContenidoCarrito();  // Recarga el carrito después de eliminar
+        })
+        .catch(err => {
+            console.error("Error al eliminar del carrito:", err);
+        });
 }

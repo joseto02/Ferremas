@@ -120,38 +120,6 @@
         }
         window.csrftoken = getCookie("csrftoken");
     </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const token = localStorage.getItem("token");
-            const logoutBtn = document.getElementById("logout-btn");
-
-            if (token && logoutBtn) {
-                logoutBtn.style.display = "inline-block";
-
-                logoutBtn.addEventListener("click", () => {
-                    fetch("/api/logout/", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": "Token " + token,
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": window.csrftoken  // si usas CSRF en la vista
-                        },
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                localStorage.removeItem("token");
-                                localStorage.removeItem("user");
-                                window.location.href = "{% url 'home' %}";
-                            } else {
-                                alert("Error al cerrar sesión");
-                            }
-                        });
-                });
-            }
-        });
-    </script>
-
     
 
     {% block extra_js %}

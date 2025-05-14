@@ -7,9 +7,10 @@ function mostrarNombreUsuario() {
 }
 
 function actualizarContadorCarrito() {
-    fetch('/api/carrito', {
+    fetch('/api/carrito/', {
         headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
+            'Authorization': 'Bearer ' + localStorage.getItem('token'),
+            // 'Authorization': 'Token ' + localStorage.getItem('token')
         }
     })
         .then(res => res.json())
@@ -17,18 +18,54 @@ function actualizarContadorCarrito() {
             if (data.items) {
                 let totalCantidad = 0;
                 data.items.forEach(item => totalCantidad += item.cantidad);
-                document.getElementById('cart-count').textContent = totalCantidad;
+                document.getElementById('contador-carrito').textContent = totalCantidad;
             }
         });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function cerrarSesion() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("No hay sesión activa.");
+        return;
+    }
+
+    fetch("/api/logout/", {
+        method: "POST",
+        headers: {
+            "Authorization": "Token " + token,
+            "Content-Type": "application/json",
+            "X-CSRFToken": window.csrftoken
+        },
+    })
+        .then(response => {
+            if (response.ok) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("username");
+                localStorage.removeItem("user");
+                window.location.href = "/";
+            } else {
+                alert("Error al cerrar sesión");
+            }
+        })
+        .catch(err => {
+            console.error("Error en la petición:", err);
+            alert("Error al cerrar sesión");
+        });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
     mostrarNombreUsuario();
     if (localStorage.getItem('token')) {
         actualizarContadorCarrito();
     }
+
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+        logoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();  // Evita navegación si es <a href="#">
+            cerrarSesion();
+        });
+    }
 });
-
-
-localStorage.removeItem("token");
-localStorage.removeItem("user");

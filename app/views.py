@@ -65,7 +65,7 @@ def api_login(request):
         return Response(
             {"error": "Usuario inactivo"}, status=status.HTTP_400_BAD_REQUEST
         )
-        
+
     login(request, user)
 
     token, created = Token.objects.get_or_create(user=user)
@@ -77,18 +77,26 @@ def api_login(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def api_register(request):
-
     data = request.data.copy()
-    data['rol'] = 1
+    data["rol"] = 1  
 
     serializer = UsuarioSerializer(data=data)
 
     if serializer.is_valid():
         user = serializer.save()
-        user.set_password(data['password'])
-        user.save()  
+        user.set_password(data["password"])
+        user.save()
+
+        # 🔥 Generar token para el nuevo usuario
+        token, created = Token.objects.get_or_create(user=user)
+
         return Response(
-            {"message": "Usuario registrado con éxito"}, status=status.HTTP_201_CREATED
+            {
+                "message": "Usuario registrado con éxito",
+                "token": token.key,
+                "user": UsuarioSerializer(user).data,
+            },
+            status=status.HTTP_201_CREATED,
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -106,14 +114,6 @@ def api_logout(request):
             {"error": "No se pudo cerrar sesión."}, status=status.HTTP_400_BAD_REQUEST
         )
 
-
-# @api_view(['POST'])
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
-# def profile(request):
-
-
-#     return Response("Estas en el perfil de {}".format(request.user.username), status=status.HTTP_200_OK)
 
 def login_view(request):
     return render(request, 'autenticacion/login.html')
@@ -140,7 +140,7 @@ def agregar_al_carrito(request):
     producto_id = request.data.get("producto_id")
 
     try:
-        producto = Producto.objects.get(id=producto_id)
+        producto = Producto.objects.get(id_producto=producto_id)
     except Producto.DoesNotExist:
         return Response(
             {"error": "Producto no encontrado."}, status=status.HTTP_404_NOT_FOUND
@@ -151,9 +151,10 @@ def agregar_al_carrito(request):
     item, creado = ItemCarrito.objects.get_or_create(carrito=carrito, producto=producto)
     if not creado:
         item.cantidad += int(request.data.get("cantidad", 1))
+        item.save()
     else:
         item.cantidad = int(request.data.get("cantidad", 1))
-    item.save()
+        item.save()
 
     return Response({"mensaje": "Producto agregado al carrito correctamente."})
 
@@ -168,28 +169,28 @@ def obtener_carrito(request):
         return Response({"items": []}, status=status.HTTP_200_OK)
 
     items = ItemCarrito.objects.filter(carrito=carrito)
-    data = []
-
-    for item in items:
-        data.append(
-            {
-                "nombre": item.producto.nombre,
-                "cantidad": item.cantidad,
-                "precio": item.producto.precio,
-            }
-        )
+    data = ItemCarritoSerializer(items, many=True).data
 
     return Response({"items": data}, status=status.HTTP_200_OK)
+
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
 def eliminar_item_carrito(request, item_id):
     try:
-        item = ItemCarrito.objects.get(id=item_id, carrito_usuario=request.user)
+        print("Usuario autenticado:", request.user)
+        item = ItemCarrito.objects.get(id=item_id)
+        print("Usuario del carrito:", item.carrito.usuario)
+
+        if item.carrito.usuario != request.user:
+            return Response({"error": "Este item no te pertenece"}, status=403)
+
         item.delete()
         return Response({"mensaje": "Item eliminado del carrito"})
     except ItemCarrito.DoesNotExist:
-        return Response({"error": "Producto no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Producto no encontrado"}, status=status.HTTP_404_NOT_FOUND
+        )
 
 
 @api_view(["PUT"])
@@ -220,6 +221,6 @@ def contador_carrito(request):
     total = 0
     if carrito:
         total = sum(
-            item.cantidad for item in carrito.items.all()
+            item.cantidad for item in ItemCarrito.objects.filter(carrito=carrito)
         )  
     return Response({"total_items": total})
