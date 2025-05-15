@@ -55,7 +55,7 @@ function agregarAlCarrito(id) {
             return res.json();
         })
         .then(data => {
-            alert(data.mensaje);
+            // alert(data.mensaje);
             actualizarContadorCarrito();
         })
         .catch(err => {
@@ -129,8 +129,9 @@ function eliminarDelCarrito(item_id) {
             return res.json();
         })
         .then(data => {
-            alert(data.mensaje);
+            // alert(data.mensaje);
             cargarContenidoCarrito();  // Recarga el carrito después de eliminar
+            actualizarContadorCarrito();
         })
         .catch(err => {
             console.error("Error al eliminar del carrito:", err);
