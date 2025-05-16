@@ -1,18 +1,18 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
-{block titulo} Home {endblock}
+{% block titulo %} Home {% endblock %}
 
 {% block content %}
-    <h1>Bienvenido a ferremas</h1>
+<div class="fondo-degradado">
+    <div class="container">
+        <h1>Bienvenido a Ferremas</h1>
 
-    <!-- Productos -->
-    <!-- Aca va la api de los Productos -->
-    <h2>Productos</h2>
-    <div id="productos-container" class="d-flex flex-wrap gap-3">
-
+        <!-- Productos -->
+        <h2>Productos</h2>
+        <div id="productos-container" class="d-flex flex-wrap gap-3"></div>
     </div>
-
+</div>
 {% endblock %}
 
 {% block extra_js %}

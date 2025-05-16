@@ -95,7 +95,7 @@ function cargarContenidoCarrito() {
             contenedor.innerHTML = "";
 
             if (!data.items || data.items.length === 0) {
-                contenedor.innerHTML = "<p>Tu carrito está vacío.</p>";
+                contenedor.innerHTML = '<p class="mensaje-vacio">Tu carrito está vacío.</p>';
                 return;
             }
 
