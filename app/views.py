@@ -1,3 +1,10 @@
+import requests
+import json
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Producto, Usuario, Carrito, ItemCarrito
 from .forms import ProductoForm
@@ -42,6 +49,74 @@ def eliminar_producto(request, id_producto):
     producto = Producto.objects.get(id_producto = id_producto)
     producto.delete()
     return redirect("productos")
+
+@login_required
+def pago_view(request):
+    try:
+        carrito = Carrito.objects.filter(usuario=request.user).last()
+        if not carrito:
+            total = 0
+        else:
+            total = sum(item.producto.precio * item.cantidad for item in carrito.items.all())
+    except Exception as e:
+        print("Error al calcular total del carrito:", e)
+        total = 0
+
+    return render(request, 'productos/pago.html', {'total': total})
+
+
+@login_required
+def iniciar_pago(request):
+    try:
+        carrito = Carrito.objects.filter(usuario=request.user).last()
+        if not carrito or not carrito.items.exists():
+            return redirect('/pago/error')
+
+        total = sum(item.producto.precio * item.cantidad for item in carrito.items.all())
+
+        url = "https://api.mercadopago.com/checkout/preferences"
+        headers = {
+            "Authorization": f"Bearer {settings.MERCADOPAGO_ACCESS_TOKEN}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "items": [
+                {
+                    "title": "Compra Ferremas",
+                    "quantity": 1,
+                    "currency_id": "CLP",
+                    "unit_price": float(total)
+                }
+            ],
+            "back_urls": {
+                "success": request.build_absolute_uri('/pago/exito/'),
+                "failure": request.build_absolute_uri('/pago/error/'),
+                "pending": request.build_absolute_uri('/pago/pendiente/')
+            },
+            # "auto_return": "approved"
+        }
+
+        response = requests.post(url, json=data, headers=headers)
+
+        if response.status_code == 201:
+            return redirect(response.json()["sandbox_init_point"])
+        else:
+            print("MercadoPago ERROR:", response.status_code, response.text)
+            return redirect('/pago/error')
+
+    except Exception as e:
+        print("ERROR en iniciar_pago:", e)
+        return redirect('/pago/error')
+    
+def pago_exito(request):
+    return render(request, 'productos/pago_exito.html')
+
+def pago_error(request):
+    return render(request, 'productos/pago_error.html')
+
+def pago_pendiente(request):
+    return render(request, 'productos/pago_pendiente.html')
 
 
 @api_view(["POST"])
@@ -222,3 +297,45 @@ def contador_carrito(request):
             item.cantidad for item in ItemCarrito.objects.filter(carrito=carrito)
         )  
     return Response({"total_items": total})
+
+@csrf_exempt
+def pagar_carrito(request):
+    import json
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    data = json.loads(request.body)
+
+    items = []
+
+    for item in data.get('carrito', []):
+        items.append({
+            "title": item['nombre'],
+            "quantity": item['cantidad'],
+            "currency_id": "CLP",
+            "unit_price": float(item['precio'])
+        })
+
+    preference_data = {
+        "items": items,
+        "back_urls": {
+            "success": request.build_absolute_uri('/pago/exito'),
+            "failure": request.build_absolute_uri('/pago/error'),
+            "pending": request.build_absolute_uri('/pago/pendiente')
+        }
+    }
+
+    url = "https://api.mercadopago.com/checkout/preferences"
+    headers = {
+        "Authorization": f"Bearer {settings.MERCADOPAGO_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, json=preference_data, headers=headers)
+
+    if response.status_code == 201:
+        init_point = response.json()["init_point"]
+        return JsonResponse({"url": init_point})
+    else:
+        return JsonResponse({"error": "Error al crear preferencia"}, status=400)

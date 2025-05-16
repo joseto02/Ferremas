@@ -1,6 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+    <style>
+    #contenido-carrito button.btn-success {
+        background-color: red !important;
+        color: white !important;
+        font-size: 24px !important;
+        padding: 10px 20px !important;
+        border-radius: 8px !important;
+        display: block !important;
+        width: 100% !important;
+        margin-top: 15px !important;
+        z-index: 9999 !important;
+    }
+    </style>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,6 +57,7 @@
                             <p>Tu carrito está vacío.</p>
                         </div>
                     </div>
+
 
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'logout' %}" id="logout-btn" class="btn btn-outline-light me-2">Cerrar sesión</a>
@@ -124,6 +139,8 @@
 
     {% block extra_js %}
     <script src="{% static 'app/js/user_info.js' %}"></script>
+    <script src="{% static 'app/js/carrito.js' %}"></script>
     {% endblock %}
+
 </body>
 </html>

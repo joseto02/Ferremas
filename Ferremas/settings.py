@@ -98,6 +98,9 @@ DATABASES = {
     }
 }
 
+# Mercado Pago - Token de prueba
+MERCADOPAGO_ACCESS_TOKEN = 'TEST-3988647505147295-051021-8715bd2ed7125d4c743ab08bd723ebb8-2428270144'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
