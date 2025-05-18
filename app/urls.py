@@ -23,7 +23,7 @@ urlpatterns = [
     path("api/register", views.api_register, name="api_register"),
     path("api/logout", views.api_logout, name="api_logout"),
     
-    path("login", views.login_view, name="login"),
+    path("login/", views.login_view, name="login"),
     path("register", views.register_view, name="register"),
     path("logout", views.cerrar_sesion, name="logout"),
     
@@ -34,7 +34,14 @@ urlpatterns = [
     path("api/carrito/eliminar/<int:item_id>/", views.eliminar_item_carrito, name="eliminar_item_carrito"),
     path("api/carrito/actualizar/<int:item_id>", views.actualizar_cantidad_item, name="actualizar_cantidad_item"),
     
-    
+    path("pago", views.pago_view, name="pago"),
+    path("pago/iniciar", views.iniciar_pago, name="iniciar_pago"),
+    path("pago/exito", views.pago_exito, name="pago_exito"),
+    path("pago/error", views.pago_error, name="pago_error"),
+    path("pago/pendiente", views.pago_pendiente, name="pago_pendiente"),
+    path('pago/carrito', views.pagar_carrito, name='pago_carrito'),
+    path("pago/iniciar", views.iniciar_pago, name="iniciar_pago"),
+
     
     
     path("", include(router.urls))

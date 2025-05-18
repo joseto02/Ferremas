@@ -1,0 +1,9 @@
+{% extends 'app/base.html' %}
+{% block titulo %} Confirmar Pago {% endblock %}
+
+{% block content %}
+<h1>Confirmación de Pago</h1>
+<p><strong>Total a pagar:</strong> ${{ total }}</p>
+
+<a href="{% url 'iniciar_pago' %}" class="btn btn-success btn-lg">🤑 Confirmar y pagar</a>
+{% endblock %}

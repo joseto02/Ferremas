@@ -110,11 +110,19 @@ function cargarContenidoCarrito() {
                     </div>
                 `;
             });
+
+            // ✅ Agregar el botón al final del carrito
+            contenedor.innerHTML += `
+                <div class="text-end mt-4">
+                    <a href="/pago" class="btn btn-success btn-lg">🤑 Pagar ahora</a>
+                </div>
+            `;
         })
         .catch(err => {
             console.error("Error al obtener el carrito", err);
         });
 }
+
 
 function eliminarDelCarrito(item_id) {
     fetch(`http://127.0.0.1:8000/api/carrito/eliminar/${item_id}/`, {
