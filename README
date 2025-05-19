@@ -1,0 +1,12 @@
+Pasos para iniciar el proyecto:
+1.Descargar mysql server
+2.Al momento de instalar mysql debe ingresar la contraseña 123456
+si coloca una distinta, debe modibicar el archivo settings.py que se encuentra en la carpeta ferremas 
+en el apartado de database.
+3.Al instalar mysql debe crear la base de datos ferremas
+4.Crear un entorno virtual en la consoloa con el comando: py -m venv myvenv
+5.Activar el entorno virtual con el comando: ./myvenv/Scripts/activate
+6.Instalar los requerimientos con el comando: pip install -r requirements.txt
+7.Hacer las migraciones con el comando: py manage.py makemigrations
+8.Hacer las migraciones con el comando: py manage.py migrate
+9.Finalmente correr el servidor con el comando: py manage.py runserver

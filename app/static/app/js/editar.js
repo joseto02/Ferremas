@@ -7,7 +7,7 @@ formulario.addEventListener("submit", function (e) {
 
     const formData = new FormData(formulario);
 
-    // Limpia errores anteriores
+    
     document.querySelectorAll(".help-text").forEach(div => {
         div.innerText = "";
     });

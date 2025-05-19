@@ -111,7 +111,6 @@ function cargarContenidoCarrito() {
                 `;
             });
 
-            // ✅ Agregar el botón al final del carrito
             contenedor.innerHTML += `
                 <div class="text-end mt-4">
                     <a href="/pago" class="btn btn-success btn-lg">🤑 Pagar ahora</a>

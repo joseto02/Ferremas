@@ -162,7 +162,6 @@ def api_register(request):
         user.set_password(data["password"])
         user.save()
 
-        # 🔥 Generar token para el nuevo usuario
         token, created = Token.objects.get_or_create(user=user)
 
         return Response(

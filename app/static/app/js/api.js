@@ -1,7 +1,6 @@
 const tabla = document.getElementById('tabla-productos');
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-//consumir api
 fetch('/api/productos')
     .then(res => res.json())
     .then(data => {

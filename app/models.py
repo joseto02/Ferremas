@@ -42,11 +42,11 @@ class Producto(models.Model):
         return self.nombre
 
     def delete(self, *args, **kwargs):
-        # Verificamos si la imagen existe y si tiene un nombre
+        
         if self.imagen and self.imagen.name:
             self.imagen.storage.delete(
                 self.imagen.name
-            )  # Eliminamos la imagen de los archivos
+            )  
         super().delete(
             *args, **kwargs
         ) 
@@ -73,7 +73,7 @@ class Orden(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     carrito = models.OneToOneField(Carrito, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=50, default="pendiente")  # pendiente, entregado, cancelado
+    estado = models.CharField(max_length=50, default="pendiente")  
 
     def __str__(self):
         return f"Orden #{self.id} - {self.usuario}"
