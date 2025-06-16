@@ -56,7 +56,6 @@ function cerrarSesion() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("Script cargado corectamente");
     mostrarNombreUsuario();
     if (localStorage.getItem('token')) {
         actualizarContadorCarrito();
@@ -64,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const logoutBtn = document.getElementById("logout-btn");
     if (logoutBtn) {
-        console.log("boton logout encontrado");
         logoutBtn.addEventListener("click", (e) => {
             e.preventDefault();
             cerrarSesion();

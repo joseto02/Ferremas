@@ -12,12 +12,12 @@ from django.contrib.auth import logout, login
 
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 
-from .serializers import UsuarioSerializer, ItemCarritoSerializer, CarritoSerializer
+from .serializers import UsuarioSerializer, ItemCarritoSerializer, CarritoSerializer, ProductoSerializer
 
 # Create your views here.
 
@@ -29,26 +29,59 @@ def productos(request):
     return render(request, 'productos/index.html', {'productos': productos})
 
 def crear_producto(request):
-    formulario = ProductoForm(request.POST or None, request.FILES or None)
-    if formulario.is_valid():
-        formulario.save()
-        return redirect('productos')
-    return render(request, "productos/crear.html", {'formulario': formulario})
+    return render(request, "productos/crear.html", {'formulario': ProductoForm()})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def listar_productos_api(request):
+    productos = Producto.objects.all()
+    serializer = ProductoSerializer(productos, many=True)
+    return Response(serializer.data)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def crear_producto_api(request):
+    serializer = ProductoSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def editar_producto(request, id_producto):
     producto = Producto.objects.get(id_producto=id_producto)
-    formulario = ProductoForm(request.POST or None, request.FILES or None, instance=producto)
-    if formulario.is_valid() and request.POST:
-        formulario.save()
-        return redirect("productos")
+    formulario = ProductoForm(instance=producto)
     return render(request, "productos/editar.html", {"formulario": formulario, "producto": producto})
 
 
-def eliminar_producto(request, id_producto):
-    producto = Producto.objects.get(id_producto = id_producto)
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def editar_producto_api(request, id_producto):
+    try:
+        producto = Producto.objects.get(id_producto=id_producto)
+    except Producto.DoesNotExist:
+        return Response(
+            {"error": "Producto no encontrado"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    serializer = ProductoSerializer(producto, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def eliminar_producto_api(request, id_producto):
+    try:
+        producto = Producto.objects.get(id_producto=id_producto)
+    except Producto.DoesNotExist:
+        return Response({"error": "Producto no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
     producto.delete()
-    return redirect("productos")
+    return Response({"mensaje": "Producto eliminado correctamente"}, status=status.HTTP_204_NO_CONTENT)
 
 @login_required
 def pago_view(request):
@@ -108,7 +141,7 @@ def iniciar_pago(request):
     except Exception as e:
         print("ERROR en iniciar_pago:", e)
         return redirect('/pago/error')
-    
+
 def pago_exito(request):
     return render(request, 'productos/pago_exito.html')
 

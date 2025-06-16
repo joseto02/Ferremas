@@ -3,6 +3,8 @@ const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').va
 const productoId = formulario.dataset.id;
 
 formulario.addEventListener("submit", function (e) {
+    console.log("script cargado correctamente");
+
     e.preventDefault();
 
     const formData = new FormData(formulario);
@@ -11,7 +13,7 @@ formulario.addEventListener("submit", function (e) {
         div.innerText = "";
     });
 
-    fetch('/api/productos/', {
+    fetch('/api/productos/crear', {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrfToken

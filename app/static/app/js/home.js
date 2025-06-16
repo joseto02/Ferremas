@@ -39,7 +39,7 @@ function crearTarjetaProducto(producto) {
 }
 
 function agregarAlCarrito(id) {
-    fetch("http://127.0.0.1:8000/api/carrito/agregar/", {
+    fetch("/api/carrito/agregar/", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -124,7 +124,7 @@ function cargarContenidoCarrito() {
 
 
 function eliminarDelCarrito(item_id) {
-    fetch(`http://127.0.0.1:8000/api/carrito/eliminar/${item_id}/`, {
+    fetch(`/api/carrito/eliminar/${item_id}/`, {
         method: 'DELETE',
         headers: {
             'Authorization': 'Token ' + localStorage.getItem('token'),
