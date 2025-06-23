@@ -18,9 +18,9 @@ urlpatterns = [
     path("productos/editar/<int:id_producto>", views.editar_producto, name="editar_producto"),
     
     
-    path("api/productos/lista", views.listar_productos_api, name="listar_productos_api"),
-    path("api/productos/crear", views.crear_producto_api, name="crear_producto_api"),
-    path("api/productos/<int:id_producto>", views.crear_producto_api, name="crear_producto_api"),
+    path("api/productos/lista/", views.listar_productos_api, name="listar_productos_api"),
+    path("api/productos/crear/", views.crear_producto_api, name="crear_producto_api"),
+    path("api/productos/<int:id_producto>", views.editar_producto_api, name="editar_producto_api"),
     path("api/productos/<int:id_producto>/eliminar", views.eliminar_producto_api, name="eliminar_producto_api"),
     
     
@@ -33,7 +33,6 @@ urlpatterns = [
     path("register", views.register_view, name="register"),
     path("logout", views.cerrar_sesion, name="logout"),
     
-    # path("carrito", views.carrito_view, name="carrito"),
     path("api/carrito/", views.obtener_carrito, name="obtener_carrito"),
     path("api/carrito/contador/", views.contador_carrito, name="contador_carrito"),
     path("api/carrito/agregar/", views.agregar_al_carrito, name="agregar_al_carrito"),

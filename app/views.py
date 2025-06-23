@@ -33,14 +33,14 @@ def crear_producto(request):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticatedOrReadOnly])
+@permission_classes([])
 def listar_productos_api(request):
     productos = Producto.objects.all()
     serializer = ProductoSerializer(productos, many=True)
     return Response(serializer.data)
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticatedOrReadOnly])
+@permission_classes([])
 def crear_producto_api(request):
     serializer = ProductoSerializer(data=request.data)
     if serializer.is_valid():
@@ -56,7 +56,7 @@ def editar_producto(request, id_producto):
 
 
 @api_view(["PATCH"])
-@permission_classes([IsAuthenticatedOrReadOnly])
+@permission_classes([])
 def editar_producto_api(request, id_producto):
     try:
         producto = Producto.objects.get(id_producto=id_producto)
@@ -73,7 +73,7 @@ def editar_producto_api(request, id_producto):
 
 
 @api_view(["DELETE"])
-@permission_classes([IsAuthenticatedOrReadOnly])
+@permission_classes([])
 def eliminar_producto_api(request, id_producto):
     try:
         producto = Producto.objects.get(id_producto=id_producto)

@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function fetchProductos() {
-    fetch("/api/productos/")
+    fetch("/api/productos/lista")
         .then(res => res.json())
         .then(data => {
             const contenedor = document.getElementById("productos-container");
