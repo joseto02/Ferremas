@@ -1,4 +1,6 @@
 {% extends 'app/base.html' %}
+{% load static %}  {# Esta línea es necesaria para usar la etiqueta static correctamente #}
+
 {% block titulo %} Confirmar Pago {% endblock %}
 
 {% block content %}
@@ -6,4 +8,8 @@
 <p><strong>Total a pagar:</strong> ${{ total }}</p>
 
 <a href="{% url 'iniciar_pago' %}" class="btn btn-success btn-lg">🤑 Confirmar y pagar</a>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'app/js/home.js' %}"></script>
 {% endblock %}
